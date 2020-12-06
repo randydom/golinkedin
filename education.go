@@ -1,4 +1,4 @@
-package linkedin
+package golinkedin
 
 import (
 	"encoding/json"
@@ -38,23 +38,6 @@ type Education struct {
 	MultiLocaleDescription        *MultiLocale                   `json:"multiLocaleDescription,omitempty"`
 	MultiLocaleActivities         *MultiLocale                   `json:"multiLocaleActivities,omitempty"`
 	MultiLocaleDegreeName         *MultiLocale                   `json:"multiLocaleDegreeName,omitempty"`
-}
-
-type School struct {
-	ObjectUrn     string `json:"objectUrn,omitempty"`
-	EntityUrn     string `json:"entityUrn,omitempty"`
-	Active        bool   `json:"active,omitempty"`
-	Logo          *Logo  `json:"logo,omitempty"`
-	SchoolName    string `json:"schoolName,omitempty"`
-	TrackingID    string `json:"trackingId,omitempty"`
-	Image         Image  `json:"image,omitempty"`
-	Subtext       Text   `json:"subtext,omitempty"`
-	TargetUrn     string `json:"targetUrn,omitempty"`
-	Text          Text   `json:"text,omitempty"`
-	DashTargetUrn string `json:"dashTargetUrn,omitempty"`
-	Type          string `json:"type,omitempty"`
-	TrackingUrn   string `json:"trackingUrn,omitempty"`
-	Title         Title  `json:"title,omitempty"`
 }
 
 type Title struct {

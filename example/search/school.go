@@ -7,13 +7,13 @@ import (
 	"github.com/tamboto2000/golinkedin"
 )
 
-func searchSchool(ln *linkedin.Linkedin, keywords string) error {
+func searchSchool(ln *golinkedin.Linkedin, keywords string) error {
 	schNode, err := ln.SearchSchool(keywords)
 	if err != nil {
 		return err
 	}
 
-	schs := make([]linkedin.School, 0)
+	schs := make([]golinkedin.School, 0)
 	for schNode.Next() {
 		schs = append(schs, schNode.Elements[0].Elements...)
 		if len(schs) >= 20 {

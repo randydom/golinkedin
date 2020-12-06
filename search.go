@@ -1,4 +1,4 @@
-package linkedin
+package golinkedin
 
 import (
 	"encoding/json"
@@ -25,12 +25,14 @@ const (
 
 // Search Origin
 const (
-	// OFacetedSearch could be used for people search
+	// OriginFacetedSearch could be used for people search
 	OriginFacetedSearch = "FACETED_SEARCH"
-	// OSwitchSearchVertical could be used for people search
+	// OriginSwitchSearchVertical could be used for people search
 	OriginSwitchSearchVertical = "SWITCH_SEARCH_VERTICAL"
-	// OOtther could be used for geo search
+	// OriginOtther could be used for geo search
 	OriginOther = "OTHER"
+	// OriginMemberProfileCannedSearch can be used for people search
+	OriginMemberProfileCannedSearch = "MEMBER_PROFILE_CANNED_SEARCH"
 )
 
 // Contact Interest values
@@ -62,6 +64,7 @@ const (
 	TypeIndustry    = "INDUSTRY"
 	TypeSchool      = "SCHOOL"
 	TypeSkill       = "SKILL"
+	TypeSearchHits  = "SEARCH_HITS"
 )
 
 // Values of param q, not to be confused with tag `q` on param struct or QueryContext
@@ -268,20 +271,34 @@ func composeFilter(obj interface{}) string {
 	return filter.str()
 }
 
-func (ln *Linkedin) SearchPeople(keywords string, filter *PeopleSearchFilter) (*PeopleNode, error) {
+// SearchPeople search people based on filter.
+// If filter is nil, default value will be used, and so with ctx and origin
+func (ln *Linkedin) SearchPeople(keywords string, filter *PeopleSearchFilter, ctx *QueryContext, origin string) (*PeopleNode, error) {
 	if filter == nil {
 		filter = DefaultSearchPeopleFilter
 	}
 
-	filter.ResultType = ResultPeople
+	if ctx == nil {
+		ctx = DefaultSearchPeopleQueryContext
+	}
 
-	raw, err := ln.get("/search/blended", url.Values{
-		"keywords":     {keywords},
-		"origin":       {OriginFacetedSearch},
+	if origin == "" {
+		origin = OriginFacetedSearch
+	}
+
+	filter.ResultType = ResultPeople
+	urlVals := url.Values{
+		"origin":       {origin},
 		"q":            {QAll},
 		"filters":      {composeFilter(filter)},
-		"queryContext": {composeFilter(DefaultSearchPeopleQueryContext)},
-	})
+		"queryContext": {composeFilter(ctx)},
+	}
+
+	if keywords != "" {
+		urlVals.Set("keywords", keywords)
+	}
+
+	raw, err := ln.get("/search/blended", urlVals)
 
 	if err != nil {
 		return nil, err
@@ -295,7 +312,9 @@ func (ln *Linkedin) SearchPeople(keywords string, filter *PeopleSearchFilter) (*
 	peopleNode.Keywords = keywords
 	peopleNode.ln = ln
 	peopleNode.Filters = filter
-	peopleNode.QueryContext = DefaultSearchPeopleQueryContext
+	peopleNode.QueryContext = ctx
+	peopleNode.Origin = origin
+	peopleNode.Paging.Start += peopleNode.Paging.Count
 
 	return peopleNode, nil
 }
@@ -322,6 +341,7 @@ func (ln *Linkedin) SearchGeo(keywords string) (*GeoNode, error) {
 
 	geoNode.ln = ln
 	geoNode.Keywords = keywords
+	geoNode.Paging.Start += geoNode.Paging.Count
 
 	return geoNode, nil
 }
@@ -347,6 +367,7 @@ func (ln *Linkedin) SearchCompany(keywords string) (*CompanyNode, error) {
 
 	compNode.ln = ln
 	compNode.Keywords = keywords
+	compNode.Paging.Start += compNode.Paging.Count
 
 	return compNode, nil
 }
@@ -371,6 +392,7 @@ func (ln *Linkedin) SearchIndustry(keywords string) (*IndustryNode, error) {
 
 	indNode.ln = ln
 	indNode.Keywords = keywords
+	indNode.Paging.Start += indNode.Paging.Count
 
 	return indNode, nil
 }
@@ -396,6 +418,7 @@ func (ln *Linkedin) SearchSchool(keywords string) (*SchoolNode, error) {
 
 	schoolNode.ln = ln
 	schoolNode.Keywords = keywords
+	schoolNode.Paging.Start += schoolNode.Paging.Count
 
 	return schoolNode, nil
 }
@@ -421,6 +444,7 @@ func (ln *Linkedin) SearchService(keywords string) (*ServiceNode, error) {
 
 	svcNode.ln = ln
 	svcNode.Keywords = keywords
+	svcNode.Paging.Start += svcNode.Paging.Count
 
 	return svcNode, nil
 }
@@ -446,6 +470,7 @@ func (ln *Linkedin) SearchGroup(keywords string) (*GroupNode, error) {
 
 	groupNode.ln = ln
 	groupNode.Keywords = keywords
+	groupNode.Paging.Start += groupNode.Paging.Count
 
 	return groupNode, nil
 }

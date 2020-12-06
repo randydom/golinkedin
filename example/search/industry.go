@@ -7,13 +7,13 @@ import (
 	"github.com/tamboto2000/golinkedin"
 )
 
-func searchIndustry(ln *linkedin.Linkedin, keywords string) error {
+func searchIndustry(ln *golinkedin.Linkedin, keywords string) error {
 	indNode, err := ln.SearchIndustry(keywords)
 	if err != nil {
 		return err
 	}
 
-	inds := make([]linkedin.Industry, 0)
+	inds := make([]golinkedin.Industry, 0)
 	for indNode.Next() {
 		inds = append(inds, indNode.Elements...)
 		if len(inds) >= 20 {

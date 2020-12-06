@@ -7,13 +7,13 @@ import (
 	"github.com/tamboto2000/golinkedin"
 )
 
-func searchGeo(ln *linkedin.Linkedin, keyword string) error {
+func searchGeo(ln *golinkedin.Linkedin, keyword string) error {
 	geoNode, err := ln.SearchGeo(keyword)
 	if err != nil {
 		return err
 	}
 
-	geos := make([]linkedin.Geo, 0)
+	geos := make([]golinkedin.Geo, 0)
 	for geoNode.Next() {
 		geos = append(geos, geoNode.Elements...)
 		if len(geos) >= 20 {

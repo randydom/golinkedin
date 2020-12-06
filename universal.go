@@ -1,4 +1,4 @@
-package linkedin
+package golinkedin
 
 // Paging control resource cursoring.
 // It is highly advised to NOT CHANGE ANY OF THE VALUES OF Paging as it can cause infinite loop when cursoring
@@ -64,6 +64,7 @@ type Logo struct {
 	COMLinkedinCommonVectorImage *VectorImage `json:"com.linkedin.common.VectorImage,omitempty"`
 	// Sometimes in here, make sure to check both of these fields
 	VectorImage *VectorImage `json:"vectorImage,omitempty"`
+	Image       *Image       `json:"image,omitempty"`
 }
 
 // TimePeriod represent a period of time
@@ -96,12 +97,6 @@ type Locale struct {
 	AntiAbuseAnnotations []AntiAbuseAnnotation `json:"$anti_abuse_annotations,omitempty"`
 }
 
-type EmployeeCountRange struct {
-	Start      int    `json:"start,omitempty"`
-	RecipeType string `json:"$recipeType,omitempty"`
-	End        int    `json:"end,omitempty"`
-}
-
 type Country struct {
 	RecipeType           string `json:"$recipeType,omitempty"`
 	EntityUrn            string `json:"entityUrn,omitempty"`
@@ -111,6 +106,14 @@ type Country struct {
 type Location struct {
 	PreferredGeoPlace string `json:"preferredGeoPlace,omitempty"`
 	CountryCode       string `json:"countryCode,omitempty"`
+	GeographicArea    string `json:"geographicArea,omitempty"`
+	Country           string `json:"country,omitempty"`
+	City              string `json:"city,omitempty"`
+	PostalCode        string `json:"postalCode,omitempty"`
+	Description       string `json:"description,omitempty"`
+	Headquarter       bool   `json:"headquarter,omitempty"`
+	Line2             string `json:"line2,omitempty"`
+	Line1             string `json:"line1,omitempty"`
 }
 
 type Picture struct {
@@ -118,8 +121,9 @@ type Picture struct {
 }
 
 type Text struct {
-	TextDirection string `json:"textDirection,omitempty"`
-	Text          string `json:"text,omitempty"`
+	TextDirection string        `json:"textDirection,omitempty"`
+	Text          string        `json:"text,omitempty"`
+	Attributes    []interface{} `json:"attributes,omitempty"`
 }
 
 type Attribute struct {
@@ -127,13 +131,18 @@ type Attribute struct {
 	MiniProfile *MiniProfile `json:"miniProfile,omitempty"`
 	MiniSchool  *MiniSchool  `json:"miniSchool,omitempty"`
 	MiniGroup   *MiniGroup   `json:"miniGroup,omitempty"`
+	Distance    *Distance    `json:"distance,omitempty"`
 	SourceType  string       `json:"sourceType,omitempty"`
-	Start       int64        `json:"start,omitempty"`
-	Length      int64        `json:"length,omitempty"`
+	Start       int          `json:"start,omitempty"`
+	Length      int          `json:"length,omitempty"`
 	// can be string or Type
 	Type        interface{} `json:"type,omitempty"`
 	ArtDecoIcon string      `json:"artDecoIcon,omitempty"`
 	VectorImage VectorImage `json:"vectorImage,omitempty"`
+}
+
+type Distance struct {
+	Value string `json:"value"`
 }
 
 type MiniGroup struct {
@@ -146,8 +155,9 @@ type MiniGroup struct {
 }
 
 type Image struct {
-	Attributes                  []Attribute   `json:"attributes,omitempty"`
-	AccessibilityTextAttributes []interface{} `json:"accessibilityTextAttributes,omitempty"`
+	COMLinkedinCommonVectorImage *VectorImage  `json:"com.linkedin.common.VectorImage,omitempty"`
+	Attributes                   []Attribute   `json:"attributes,omitempty"`
+	AccessibilityTextAttributes  []interface{} `json:"accessibilityTextAttributes,omitempty"`
 }
 
 type MiniSchool struct {
@@ -163,7 +173,7 @@ type Metadata struct {
 	NewRelevanceFeed     bool         `json:"newRelevanceFeed,omitempty"`
 	ID                   string       `json:"id,omitempty"`
 	Type                 string       `json:"type,omitempty"`
-	QueryAfterTime       int64        `json:"queryAfterTime,omitempty"`
+	QueryAfterTime       int          `json:"queryAfterTime,omitempty"`
 	Urn                  string       `json:"urn,omitempty"`
 	ActionsPosition      string       `json:"actionsPosition,omitempty"`
 	ActionTriggerEnabled bool         `json:"actionTriggerEnabled,omitempty"`
@@ -181,16 +191,22 @@ type Action struct {
 	Subtext    string      `json:"subtext,omitempty"`
 	SaveAction *SaveAction `json:"saveAction,omitempty"`
 	// can be string or Text
-	Text             interface{}  `json:"text,omitempty"`
-	URL              string       `json:"url,omitempty"`
-	TargetUrn        string       `json:"targetUrn,omitempty"`
-	ContentSource    string       `json:"contentSource,omitempty"`
-	AuthorProfileID  string       `json:"authorProfileId,omitempty"`
-	AuthorUrn        string       `json:"authorUrn,omitempty"`
-	ConfirmationText *Description `json:"confirmationText,omitempty"`
+	Text             interface{} `json:"text,omitempty"`
+	URL              string      `json:"url,omitempty"`
+	TargetUrn        string      `json:"targetUrn,omitempty"`
+	ContentSource    string      `json:"contentSource,omitempty"`
+	AuthorProfileID  string      `json:"authorProfileId,omitempty"`
+	AuthorUrn        string      `json:"authorUrn,omitempty"`
+	ConfirmationText *Text       `json:"confirmationText,omitempty"`
 }
 
 type SaveAction struct {
 	EntityUrn string `json:"entityUrn,omitempty"`
 	Saved     bool   `json:"saved,omitempty"`
+}
+
+type CountRange struct {
+	Start  int `json:"start,omitempty"`
+	Length int `json:"length,omitempty"`
+	End    int `json:"end,omitempty"`
 }

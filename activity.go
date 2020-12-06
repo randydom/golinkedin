@@ -1,4 +1,4 @@
-package linkedin
+package golinkedin
 
 import (
 	"encoding/json"
@@ -25,13 +25,13 @@ type Activity struct {
 	LinkedinArticleUrn string           `json:"linkedinArticleUrn,omitempty"`
 	ContentText        *Text            `json:"contentText,omitempty"`
 	Title              string           `json:"title,omitempty"`
-	NumLikes           int64            `json:"numLikes,omitempty"`
+	NumLikes           int              `json:"numLikes,omitempty"`
 	PostedDate         *Date            `json:"postedDate,omitempty"`
 	SocialDetail       *SocialDetail    `json:"socialDetail,omitempty"`
 	TrackingData       *TrackingData    `json:"trackingData,omitempty"`
-	NumComments        int64            `json:"numComments,omitempty"`
+	NumComments        int              `json:"numComments,omitempty"`
 	CreatedDate        *Date            `json:"createdDate,omitempty"`
-	PostedAt           int64            `json:"postedAt,omitempty"`
+	PostedAt           int              `json:"postedAt,omitempty"`
 	EntityUrn          string           `json:"entityUrn,omitempty"`
 	AuthorComponent    *AuthorComponent `json:"authorComponent,omitempty"`
 	Actor              Actor            `json:"actor,omitempty"`
@@ -41,8 +41,8 @@ type Activity struct {
 }
 
 type Commentary struct {
-	TemplateType string      `json:"templateType,omitempty"`
-	Text         Description `json:"text,omitempty"`
+	TemplateType string `json:"templateType,omitempty"`
+	Text         Text   `json:"text,omitempty"`
 }
 
 type Content struct {
@@ -53,13 +53,13 @@ type COMLinkedinVoyagerFeedRenderArticleComponent struct {
 	TemplateType            string                                                    `json:"templateType,omitempty"`
 	Urn                     string                                                    `json:"urn,omitempty"`
 	LargeImage              *Image                                                    `json:"largeImage,omitempty"`
-	Subtitle                *Description                                              `json:"subtitle,omitempty"`
+	Subtitle                *Text                                                     `json:"subtitle,omitempty"`
 	NavigationContext       *NavigationContext                                        `json:"navigationContext,omitempty"`
 	Type                    string                                                    `json:"type,omitempty"`
-	Title                   *Description                                              `json:"title,omitempty"`
+	Title                   *Text                                                     `json:"title,omitempty"`
 	AuthorNavigationContext *NavigationContext                                        `json:"authorNavigationContext,omitempty"`
-	Author                  *Description                                              `json:"author,omitempty"`
-	Description             *Description                                              `json:"description,omitempty"`
+	Author                  *Text                                                     `json:"author,omitempty"`
+	Description             *Text                                                     `json:"description,omitempty"`
 	FollowAction            *COMLinkedinVoyagerFeedRenderArticleComponentFollowAction `json:"followAction,omitempty"`
 	SubtitleImage           *Image                                                    `json:"subtitleImage,omitempty"`
 	SubscribeAction         *SubscribeAction                                          `json:"subscribeAction,omitempty"`
@@ -68,7 +68,7 @@ type COMLinkedinVoyagerFeedRenderArticleComponent struct {
 type SubscribeAction struct {
 	EntityUrn       string `json:"entityUrn,omitempty"`
 	Subscribed      bool   `json:"subscribed,omitempty"`
-	SubscriberCount int64  `json:"subscriberCount,omitempty"`
+	SubscriberCount int    `json:"subscriberCount,omitempty"`
 }
 
 type COMLinkedinVoyagerFeedRenderArticleComponentFollowAction struct {
@@ -92,7 +92,7 @@ type Actor struct {
 	Name                   *Name              `json:"name,omitempty"`
 	SubDescription         *SubDescription    `json:"subDescription,omitempty"`
 	NavigationContext      *NavigationContext `json:"navigationContext,omitempty"`
-	Description            *Description       `json:"description,omitempty"`
+	Description            *Text              `json:"description,omitempty"`
 	ShowInfluencerBadge    bool               `json:"showInfluencerBadge,omitempty"`
 	FollowAction           *ActorFollowAction `json:"followAction,omitempty"`
 }
@@ -118,21 +118,15 @@ type SubDescription struct {
 }
 
 type AuthorComponent struct {
-	Name        *Description          `json:"name,omitempty"`
+	Name        *Text                 `json:"name,omitempty"`
 	Image       *AuthorComponentImage `json:"image,omitempty"`
-	Description *Description          `json:"description,omitempty"`
+	Description *Text                 `json:"description,omitempty"`
 }
 
 type AuthorComponentImage struct {
 	Attributes                  []Attribute   `json:"attributes,omitempty"`
 	AccessibilityTextAttributes []interface{} `json:"accessibilityTextAttributes,omitempty"`
 	AccessibilityText           string        `json:"accessibilityText,omitempty"`
-}
-
-type Description struct {
-	TextDirection string        `json:"textDirection,omitempty"`
-	Attributes    []interface{} `json:"attributes,omitempty"`
-	Text          string        `json:"text,omitempty"`
 }
 
 type TrackingData struct {
@@ -145,7 +139,7 @@ type SocialDetail struct {
 	SocialPermissions         *SocialPermissions         `json:"socialPermissions,omitempty"`
 	Liked                     bool                       `json:"liked,omitempty"`
 	ShowShareButton           bool                       `json:"showShareButton,omitempty"`
-	TotalShares               int64                      `json:"totalShares,omitempty"`
+	TotalShares               int                        `json:"totalShares,omitempty"`
 	Urn                       string                     `json:"urn,omitempty"`
 	ThreadID                  string                     `json:"threadId,omitempty"`
 	AllowedCommentersScope    string                     `json:"allowedCommentersScope,omitempty"`
@@ -172,16 +166,16 @@ type SocialPermissions struct {
 type TotalSocialActivityCounts struct {
 	SocialDetailEntityUrn string              `json:"socialDetailEntityUrn,omitempty"`
 	Urn                   string              `json:"urn,omitempty"`
-	NumComments           int64               `json:"numComments,omitempty"`
+	NumComments           int                 `json:"numComments,omitempty"`
 	ReactionTypeCounts    []ReactionTypeCount `json:"reactionTypeCounts,omitempty"`
 	EntityUrn             string              `json:"entityUrn,omitempty"`
-	NumShares             int64               `json:"numShares,omitempty"`
-	NumLikes              int64               `json:"numLikes,omitempty"`
+	NumShares             int                 `json:"numShares,omitempty"`
+	NumLikes              int                 `json:"numLikes,omitempty"`
 	Liked                 bool                `json:"liked,omitempty"`
 }
 
 type ReactionTypeCount struct {
-	Count        int64  `json:"count,omitempty"`
+	Count        int    `json:"count,omitempty"`
 	ReactionType string `json:"reactionType,omitempty"`
 }
 

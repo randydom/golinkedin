@@ -7,13 +7,13 @@ import (
 	"github.com/tamboto2000/golinkedin"
 )
 
-func searchPeople(ln *linkedin.Linkedin, keywords string) error {
+func searchPeople(ln *golinkedin.Linkedin, keywords string) error {
 	pplNode, err := ln.SearchPeople(keywords, nil)
 	if err != nil {
 		return err
 	}
 
-	schs := make([]linkedin.People, 0)
+	schs := make([]golinkedin.People, 0)
 	for pplNode.Next() {
 		schs = append(schs, pplNode.Elements[0].Elements...)
 		if len(schs) >= 20 {

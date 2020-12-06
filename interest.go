@@ -1,4 +1,4 @@
-package linkedin
+package golinkedin
 
 import (
 	"encoding/json"
@@ -7,17 +7,17 @@ import (
 )
 
 type InterestNode struct {
-	ProfileID string            `json:"profileId,omitempty"`
-	Type      string            `json:"type,omitempty"`
-	Elements  []InterestElement `json:"elements,omitempty"`
-	Paging    Paging            `json:"paging,omitempty"`
+	ProfileID string     `json:"profileId,omitempty"`
+	Type      string     `json:"type,omitempty"`
+	Elements  []Interest `json:"elements,omitempty"`
+	Paging    Paging     `json:"paging,omitempty"`
 
 	err        error
 	ln         *Linkedin
 	stopCursor bool
 }
 
-type InterestElement struct {
+type Interest struct {
 	Entity        *Entity        `json:"entity,omitempty"`
 	FollowingInfo *FollowingInfo `json:"followingInfo,omitempty"`
 }
@@ -32,7 +32,7 @@ type Entity struct {
 type FollowingInfo struct {
 	FollowingType string `json:"followingType,omitempty"`
 	EntityUrn     string `json:"entityUrn,omitempty"`
-	FollowerCount int64  `json:"followerCount,omitempty"`
+	FollowerCount int    `json:"followerCount,omitempty"`
 	Following     bool   `json:"following,omitempty"`
 	TrackingUrn   string `json:"trackingUrn,omitempty"`
 }

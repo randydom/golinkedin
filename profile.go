@@ -1,4 +1,4 @@
-package linkedin
+package golinkedin
 
 import (
 	"encoding/json"
@@ -93,8 +93,8 @@ type ContactInfo struct {
 }
 
 type BirthDateOn struct {
-	Month int64 `json:"month,omitempty"`
-	Day   int64 `json:"day,omitempty"`
+	Month int `json:"month,omitempty"`
+	Day   int `json:"day,omitempty"`
 }
 
 type PhoneNumber struct {
@@ -154,6 +154,23 @@ func (ln *Linkedin) ProfileByUsername(username string) (*ProfileNode, error) {
 // ProfileID return profile's ID, parsed from EntityURN
 func (p *ProfileNode) ProfileID() string {
 	return parseProfileID(p.Elements[0].EntityUrn)
+}
+
+// Connections return profile connections.
+// You can perform this action by calling Linkedin.SearchPeople
+func (p *ProfileNode) Connections() (*PeopleNode, error) {
+	return p.ln.SearchPeople(
+		"",
+		&PeopleSearchFilter{
+			Network:      []string{Rank1, Rank2, Rank3},
+			ConnectionOf: p.ProfileID(),
+			ResultType:   ResultPeople,
+		},
+		&QueryContext{
+			SpellCorrectionEnabled: true,
+		},
+		OriginMemberProfileCannedSearch,
+	)
 }
 
 // Organizations prepare OrganizarionNode for cursoring

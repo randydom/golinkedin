@@ -1,29 +1,23 @@
-package linkedin
+package golinkedin
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/url"
 	"strconv"
 )
 
 type PeopleNode struct {
 	Metadata     Metadata            `json:"metadata,omitempty"`
-	Elements     []PeopleNodeElement `json:"elements,omitempty"`
+	Elements     []People            `json:"elements,omitempty"`
 	Paging       Paging              `json:"paging,omitempty"`
 	Keywords     string              `json:"keywords,omitempty"`
 	Filters      *PeopleSearchFilter `json:"peopleSearchFilter,omitempty"`
 	QueryContext *QueryContext       `json:"queryContext,omitempty"`
+	Origin       string              `json:"origin,omitempty"`
 
 	err        error
 	ln         *Linkedin
 	stopCursor bool
-}
-
-type PeopleNodeElement struct {
-	ExtendedElements []ExtendedElement `json:"extendedElements,omitempty"`
-	Elements         []People          `json:"elements,omitempty"`
-	Type             string            `json:"type,omitempty"`
 }
 
 type ExtendedElement struct {
@@ -42,8 +36,8 @@ type Query struct {
 }
 
 type QueryAttribute struct {
-	Start  int64      `json:"start,omitempty"`
-	Length int64      `json:"length,omitempty"`
+	Start  int        `json:"start,omitempty"`
+	Length int        `json:"length,omitempty"`
 	Type   *TypeClass `json:"type,omitempty"`
 }
 
@@ -55,29 +49,32 @@ type COMLinkedinPemberlyTextBold struct {
 }
 
 type People struct {
-	Image                Image           `json:"image,omitempty"`
-	Subtext              Text            `json:"subtext,omitempty"`
-	TargetUrn            string          `json:"targetUrn,omitempty"`
-	ObjectUrn            string          `json:"objectUrn,omitempty"`
-	Text                 Text            `json:"text,omitempty"`
-	DashTargetUrn        string          `json:"dashTargetUrn,omitempty"`
-	Type                 string          `json:"type,omitempty"`
-	TrackingID           string          `json:"trackingId,omitempty"`
-	MemberDistance       *MemberDistance `json:"memberDistance,omitempty"`
-	SocialProofImagePile []Image         `json:"socialProofImagePile,omitempty"`
-	TrackingUrn          string          `json:"trackingUrn,omitempty"`
-	NavigationURL        string          `json:"navigationUrl,omitempty"`
-	Title                *Title          `json:"title,omitempty"`
-	Headless             bool            `json:"headless,omitempty"`
-	Badges               *Badges         `json:"badges,omitempty"`
-	SocialProofText      string          `json:"socialProofText,omitempty"`
-	SnippetText          *SnippetText    `json:"snippetText,omitempty"`
-	SecondaryTitle       *Title          `json:"secondaryTitle,omitempty"`
-	PublicIdentifier     string          `json:"publicIdentifier,omitempty"`
-	Headline             *Title          `json:"headline,omitempty"`
-	NameMatch            bool            `json:"nameMatch,omitempty"`
-	Subline              *Title          `json:"subline,omitempty"`
-	Insights             []Insight       `json:"insights,omitempty"`
+	// Elements contains peoples from search people result
+	Elements             []People          `json:"elements,omitempty"`
+	ExtendedElements     []ExtendedElement `json:"extendedElements,omitempty"`
+	Image                Image             `json:"image,omitempty"`
+	Subtext              Text              `json:"subtext,omitempty"`
+	TargetUrn            string            `json:"targetUrn,omitempty"`
+	ObjectUrn            string            `json:"objectUrn,omitempty"`
+	Text                 Text              `json:"text,omitempty"`
+	DashTargetUrn        string            `json:"dashTargetUrn,omitempty"`
+	Type                 string            `json:"type,omitempty"`
+	TrackingID           string            `json:"trackingId,omitempty"`
+	MemberDistance       *MemberDistance   `json:"memberDistance,omitempty"`
+	SocialProofImagePile []Image           `json:"socialProofImagePile,omitempty"`
+	TrackingUrn          string            `json:"trackingUrn,omitempty"`
+	NavigationURL        string            `json:"navigationUrl,omitempty"`
+	Title                *Title            `json:"title,omitempty"`
+	Headless             bool              `json:"headless,omitempty"`
+	Badges               *Badges           `json:"badges,omitempty"`
+	SocialProofText      string            `json:"socialProofText,omitempty"`
+	SnippetText          *SnippetText      `json:"snippetText,omitempty"`
+	SecondaryTitle       *Title            `json:"secondaryTitle,omitempty"`
+	PublicIdentifier     string            `json:"publicIdentifier,omitempty"`
+	Headline             *Title            `json:"headline,omitempty"`
+	NameMatch            bool              `json:"nameMatch,omitempty"`
+	Subline              *Title            `json:"subline,omitempty"`
+	Insights             []Insight         `json:"insights,omitempty"`
 }
 
 type Insight struct {
@@ -97,8 +94,8 @@ type SnippetText struct {
 }
 
 type InsightTextAttribute struct {
-	Start  int64  `json:"start,omitempty"`
-	Length int64  `json:"length,omitempty"`
+	Start  int    `json:"start,omitempty"`
+	Length int    `json:"length,omitempty"`
 	Type   string `json:"type,omitempty"`
 }
 
@@ -141,15 +138,20 @@ func (ppl *PeopleNode) Next() bool {
 
 	start := strconv.Itoa(ppl.Paging.Start)
 	count := strconv.Itoa(ppl.Paging.Count)
-	raw, err := ppl.ln.get("/search/blended", url.Values{
-		"keywords":     {ppl.Keywords},
-		"origin":       {OriginFacetedSearch},
+	urlVals := url.Values{
+		"origin":       {ppl.Origin},
 		"q":            {QAll},
 		"start":        {start},
 		"count":        {count},
 		"filters":      {composeFilter(ppl.Filters)},
 		"queryContext": {composeFilter(ppl.QueryContext)},
-	})
+	}
+
+	if ppl.Keywords != "" {
+		urlVals.Set("keywords", ppl.Keywords)
+	}
+
+	raw, err := ppl.ln.get("/search/blended", urlVals)
 
 	if err != nil {
 		ppl.err = err
@@ -169,11 +171,15 @@ func (ppl *PeopleNode) Next() bool {
 		return false
 	}
 
-	if len(ppl.Elements[0].Elements) < ppl.Paging.Count {
-		ppl.stopCursor = true
-	}
+	for _, elem := range ppl.Elements {
+		if elem.Type == "SEARCH_HITS" {
+			if len(elem.Elements) < ppl.Paging.Count {
+				ppl.stopCursor = true
+			}
 
-	fmt.Println("cursor")
+			break
+		}
+	}
 
 	return true
 }

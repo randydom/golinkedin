@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/tamboto2000/golinkedin/v1"
+	"github.com/tamboto2000/golinkedin"
 )
 
-func contactInfo(profile *linkedin.ProfileNode) error {
+func contactInfo(profile *golinkedin.ProfileNode) error {
 	contact, err := profile.ContactInfo()
 	if err != nil {
 		return err
